@@ -45,16 +45,17 @@ class TokenAuthentication
         $scheme = $request->getUri()->getScheme();
         $host = $request->getUri()->getHost();
 
-        /** If rules say we should not authenticate call next and return. */
-        if (false === $this->shouldAuthenticate($request)) {
-            return $next($request, $response);
-        }
-
+        
         /** HTTP allowed only if secure is false or server is in relaxed array. */
         if ("https" !== $scheme && true === $this->options["secure"]) {
             if (!in_array($host, $this->options["relaxed"])) {
                 return $response->withJson(['message' => 'Required HTTPS for token authentication.'], 401);
             }
+        }
+        
+        /** If rules say we should not authenticate call next and return. */
+        if (false === $this->shouldAuthenticate($request)) {
+            return $next($request, $response);
         }
 
         /** Call custom authenticator function */
